@@ -1,0 +1,8 @@
+credentials.json
+token.json
+venv/
+.venv/
+__pycache__/
+.DS_Store
+yearly_calendar_plan.txt
+.gitigno
