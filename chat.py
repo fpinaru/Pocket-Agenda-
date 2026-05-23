@@ -1,15 +1,16 @@
-import webbrowser
 import json
 import os.path
 import requests
+import webbrowser
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+
+
 def get_calendar_service():
     creds = None
 
@@ -31,6 +32,7 @@ def get_calendar_service():
 
     return build("calendar", "v3", credentials=creds)
 
+
 def ask_chatbot(prompt):
     response = requests.post(
         "http://localhost:11434/api/generate",
@@ -47,6 +49,8 @@ def ask_chatbot(prompt):
         return data["response"].strip()
 
     return f"Error from Ollama: {data}"
+
+
 def smart_calendar_assistant():
     user_text = input("Tell me what to add to your calendar: ")
 
@@ -84,7 +88,6 @@ Rules:
     start_datetime = f"{event_info['date']}T{event_info['start_time']}:00"
     end_datetime = f"{event_info['date']}T{event_info['end_time']}:00"
 
-    # Check conflicts
     events_result = service.events().list(
         calendarId="primary",
         timeMin=start_datetime + "-04:00",
@@ -141,6 +144,35 @@ Rules:
     print(event_link)
 
     webbrowser.open(event_link)
+
+
+def yearly_calendar_plan():
+    year = input("Which year? ")
+    goal = input("What is your main goal for this year? ")
+
+    prompt = f"""
+Create a yearly calendar plan for {year}.
+
+Main goal: {goal}
+
+Organize the answer by:
+- Year
+- Months
+- Weeks inside each month
+
+For each month, give a main focus.
+For each week, give a short plan.
+"""
+
+    answer = ask_chatbot(prompt)
+    print(answer)
+
+    with open("yearly_calendar_plan.txt", "w", encoding="utf-8") as file:
+        file.write(answer)
+
+    print("Saved to yearly_calendar_plan.txt")
+
+
 while True:
     print("\nCalendar Chatbot App")
     print("1 - Smart calendar assistant")
@@ -152,10 +184,12 @@ while True:
 
     if choice == "1":
         smart_calendar_assistant()
+
     elif choice == "2":
-        prompt = input("Ask me anything")
+        prompt = input("Ask me anything: ")
         answer = ask_chatbot(prompt)
         print(answer)
+
     elif choice == "3":
         yearly_calendar_plan()
 
