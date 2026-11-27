@@ -7,3 +7,4 @@ __pycache__/
 yearly_calendar_plan.txt
 .gitigno
 .env
+test-env/
